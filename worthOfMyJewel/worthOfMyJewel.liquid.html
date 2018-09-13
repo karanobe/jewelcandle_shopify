@@ -1,0 +1,97 @@
+
+
+{% comment %}
+  Regular page content goes here.
+{% endcomment %}
+<script src="https://www.gstatic.com/firebasejs/5.4.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.4.2/firebase-database.js"></script>
+<script type="text/javascript">
+  var config = {
+    apiKey: "AIzaSyDJSmnnI3i_o7DPETgPx1pC9vn3tg6gMoA",
+    authDomain: "jewelcandle-61e6e.firebaseapp.com",
+    databaseURL: "https://jewelcandle-61e6e.firebaseio.com",
+    projectId: "jewelcandle-61e6e",
+    storageBucket: "jewelcandle-61e6e.appspot.com",
+    messagingSenderId: "931033633783"
+  };
+firebase.initializeApp(config);
+
+
+var db = firebase.database();
+var ref = db.ref('worthOfMyJewel');
+
+var jewelData = [];
+ref.on('value', gotData, errData);
+  
+function gotData(data) {
+  var dataSet = data.val();
+    var jewel = {};
+  var ids = Object.keys(dataSet);
+  for (var i = 0; i < ids.length; i++) {
+    var j = ids[i];
+    var jewelCode = dataSet[j].jewelCode;
+    var jewelWorth = dataSet[j].jewelWorth;
+        jewel[jewelCode] = jewelWorth;
+  }
+  jewelData = jewel;
+};
+
+function errData(err) {
+  console.log('Error');
+  console.log(err);
+};
+
+$(document).ready(function() {
+  $("#enterCode").submit(function(event) {
+      event.preventDefault();
+      var enteredCode = $("#jewelCode").val();
+    var worth = jewelData[enteredCode];
+      if (worth === undefined) {
+            $("#jewelWorth").empty();
+            $("#noCode").html("Sorry we couldn't find your code.");
+        }else {
+            $("#custom-worth-div").empty();
+          $("#custom-worth-div").html("<h1 class='congrats'>Congratulations!</h1><h2 class='congrats__subheading'>Your jewel is worth</h2><h1 class='congrats jewelWorth'>$" + worth + "</h1><p class='sub-banner'><span class='sub-banner__p'>Tell your friends!</span></p><a class='js-share-twitter-link' href='https://twitter.com/intent/tweet?text=My+jewel+was+worth+%24" + worth + "%21+Find+a+gorgeous+%23jewel+inside+your+%23jewelcandle+today%21+http%3A%2F%2Fjewelcandle.us%2F'>Share on Twitter</a><iframe src='https://www.facebook.com/plugins/share_button.php?href=https%3A%2F%2Fjewel-candle.myshopify.com%2F&layout=button&size=large&mobile_iframe=true&width=73&height=28&appId' width='73' height='28' style='border:none;overflow:hidden' scrolling='no' frameborder='0' allowTransparency='true' allow='encrypted-media'></iframe>");
+          twitterWindow();
+        }
+  });
+});
+
+function twitterWindow() {
+  $('.js-share-twitter-link').click(function(e) {
+    e.preventDefault();
+    debugger
+    var href = $(this).attr('href');
+    window.open(href, "Twitter", "height=285,width=550,resizable=1");
+  });
+};  
+
+</script>
+
+
+{% if settings.enable_multilang %}
+<div class="rte lang1">{{ page.content | split: '[lang2]' | first }}</div>
+<div class="rte lang2">{{ page.content | split: '[lang2]' | last }}</div>
+{% else %}
+<div class="rte">{{ page.content | split: '[lang2]' | first }}</div>
+{% endif %}
+
+<div id="custom-worth-div">
+  <h1 class="jewel-header"><span style="color:#54288b;">Enter Your Code</span> To Find the Worth Of your Jewel</h1>
+  <p class="jewel-p">Find the code attached to your jewelry and enter it to get
+  your jewelry appraised!</p>
+  <form id="enterCode" class="text-center">
+    <input id="jewelCode" class="jewel-code-input" type="text" placeholder="Your Code"><p id="noCode" class="text-center"></p><br>
+
+    <button type="submit" class="btn btn-primary">
+      APPRAISAL <i class="icon-user icon-white"></i>
+    </button>
+  </form>
+  <p class="sub-banner"><span class="sub-banner__p">Need Help?</span></p>
+  <p><b>Invalid Code</b>: Please send email to our Contact Us page with subject "Invalid
+  Code" and then attach your appraisal code.</p>
+  <p><b>Lost Code</b>: Please send a picture of your jewelry to our Contact Us page and we
+  will try to get back to you in 2-3 business days!</p>
+
+  
+</div>
